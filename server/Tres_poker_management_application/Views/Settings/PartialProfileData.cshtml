@@ -1,0 +1,23 @@
+﻿@model Tres_poker_management_application.Models.AllModels
+
+<div class="input-group">
+    <span class="input-group-label"><i class="fas fa-wallet"></i></span>
+    <span class="input-group-label">@Html.LabelFor(model => model.Gameprofile.Starting_Budget)</span>
+    <span class="input-group-label">@Html.DisplayFor(model => model.Gameprofile.Starting_Budget)</span>
+</div>
+<div class="input-group">
+    <span class="input-group-label"><i class="fas fa-coins"></i></span>
+    <span class="input-group-label">@Html.LabelFor(model => model.Gameprofile.Rebuy)</span>
+    <span class="input-group-label">@Html.DisplayFor(model => model.Gameprofile.Rebuy)</span>
+</div>
+<div class="input-group">
+    <span class="input-group-label"><i class="far fa-clock"></i></span>
+    <span class="input-group-label">@Html.LabelFor(model => model.Gameprofile.Pause_Time)</span>
+    <span class="input-group-label">@Html.DisplayFor(model => model.Gameprofile.Pause_Time)</span>
+</div>
+
+<div class="input-group">
+    <span class="input-group-label"><i class="fas fa-redo-alt"></i></span>
+    <span class="input-group-label">@Html.LabelFor(model => model.Gameprofile.Pause_After)</span>
+    <span class="input-group-label">@Html.DisplayFor(model => model.Gameprofile.Pause_After)</span>
+</div>

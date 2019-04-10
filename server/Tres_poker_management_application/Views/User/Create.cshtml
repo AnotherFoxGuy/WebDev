@@ -1,0 +1,19 @@
+﻿@model Tres_poker_management_application.Models.User
+@{
+    ViewBag.Title = "Create";
+}
+<div class="grid-container">
+    <h2>Nieuwe gebruiker</h2>
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        @Html.LabelFor(model => model.Firstname)
+        @Html.EditorFor(model => model.Firstname)
+        @Html.ValidationMessageFor(model => model.Firstname, "", new { @class = "validationtext" })
+        @Html.LabelFor(model => model.Lastname)
+        @Html.EditorFor(model => model.Lastname)
+        @Html.ValidationMessageFor(model => model.Lastname, "", new { @class = "validationtext" })
+        <input type="submit" value="Gebruiker toevoegen" class="button" />
+        @Html.ActionLink("Terug", "Index", "User", null, new { @class = "button" })
+    }
+</div>

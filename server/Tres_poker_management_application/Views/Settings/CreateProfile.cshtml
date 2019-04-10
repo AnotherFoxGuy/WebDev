@@ -1,0 +1,71 @@
+﻿@model Tres_poker_management_application.Models.AllModels
+@{
+    ViewBag.Title = "Create";
+}
+<div class="grid-container">
+    <h2>Nieuw profiel</h2>
+
+    <div class="grid-x grid-margin-x">
+        <div class="medium-8 large-6 cell">
+            @using (Html.BeginForm("CreateProfile", "Settings"))
+            {
+                @Html.AntiForgeryToken()
+
+                @Html.LabelFor(model => model.Gameprofile.Profilename)
+                @Html.EditorFor(model => model.Gameprofile.Profilename)
+                @Html.ValidationMessageFor(model => model.Gameprofile.Profilename, "", new { @class = "validationtext" })
+
+                @Html.LabelFor(model => model.Gameprofile.Starting_Budget)
+                @Html.EditorFor(model => model.Gameprofile.Starting_Budget)
+                @Html.ValidationMessageFor(model => model.Gameprofile.Starting_Budget, "", new { @class = "validationtext" })
+
+                @Html.LabelFor(model => model.Gameprofile.Rebuy)
+                @Html.EditorFor(model => model.Gameprofile.Rebuy)
+                @Html.ValidationMessageFor(model => model.Gameprofile.Rebuy, "", new { @class = "validationtext" })
+
+                <div class="grid-x grid-margin-x">
+                    <div class="large-6 cell">
+                        @Html.LabelFor(model => model.Gameprofile.Pause_Time)
+                        @Html.EditorFor(model => model.Gameprofile.Pause_Time)
+                        @Html.ValidationMessageFor(model => model.Gameprofile.Pause_Time, "", new { @class = "validationtext" })
+                    </div>
+                    <div class="large-6 cell">
+                        @Html.LabelFor(model => model.Gameprofile.Pause_After)
+                        @Html.EditorFor(model => model.Gameprofile.Pause_After)
+                        @Html.ValidationMessageFor(model => model.Gameprofile.Pause_After, "", new { @class = "validationtext" })
+                    </div>
+                </div>
+
+                <div class="grid-x grid-margin-x">
+                    <div class="large-6 cell">
+                        @Html.LabelFor(model => model.Round.Round_Time)
+                        @Html.EditorFor(model => model.Round.Round_Time)
+                        @Html.ValidationMessageFor(model => model.Round.Round_Time, "", new { @class = "validationtext" })
+                    </div>
+                    <div class="large-6 cell">
+                        @Html.LabelFor(model => model.Round.Number_Of_Rounds)
+                        @Html.EditorFor(model => model.Round.Number_Of_Rounds)
+                        @Html.ValidationMessageFor(model => model.Round.Number_Of_Rounds, "", new { @class = "validationtext" })
+                    </div>
+                </div>
+
+                @Html.LabelFor(model => model.Round.Small_Blind)
+                @Html.EditorFor(model => model.Round.Small_Blind)
+                @Html.ValidationMessageFor(model => model.Round.Small_Blind, "", new { @class = "validationtext" })
+
+                @Html.LabelFor(model => model.Round.Big_Blind)
+                @Html.EditorFor(model => model.Round.Big_Blind)
+                @Html.ValidationMessageFor(model => model.Round.Big_Blind, "", new { @class = "validationtext" })
+                <a class="button" id="submitbtn"><i class="fas fa-plus"></i> Toevoegen</a>
+                <a class="button" href="/Settings"><i class="fas fa-reply"></i> Terug</a>
+            }
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script>
+        $("#submitbtn").click(function () {
+            $(this).closest("form").submit();
+        });
+    </script>
+}

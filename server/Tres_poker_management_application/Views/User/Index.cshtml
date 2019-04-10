@@ -1,0 +1,63 @@
+﻿
+@{
+    ViewBag.Title = "Gebruikers";
+    var SQLModel = new Tres_poker_management_application.Models.User_SQL();
+    var ListOfUsers = SQLModel.GetUserList();
+}
+<div class="grid-container">
+    <h2>Gebruikers</h2>
+
+    @Html.ActionLink("Gebruiker toevoegen", "Create", "User", null, new { @class = "button" })
+    <table id="user-table" class="display">
+        <thead>
+            <tr>
+                <th>Naam</th>
+                <th>Gewonnen rondes</th>
+                <th>Actie</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in ListOfUsers)
+            {
+                <tr data-child-value="@item["User_ID"]">
+                    <td>@item["Firstname"] @item["Lastname"]</td>
+                    <td>gewonnen: @item["Wins"]</td>
+                    <td>
+                        <div class="button-group">
+                            <a class="button" href="/User/Edit/@item["User_ID"]"><i class="far fa-edit"></i></a>
+                            @using (Html.BeginForm("Delete", "User", new { id = item["User_ID"] }))
+                            {
+                                @Html.AntiForgeryToken()
+                                <a class="delete_user_btn button alert"><i class="far fa-trash-alt"></i></a>
+                            }
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $('#user-table').DataTable();
+        });
+
+        $(".delete_user_btn").click(function () {
+            var formDeleteUser = $(this).closest("form");
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, cancel!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                    formDeleteUser.submit();
+                }
+            });
+        });
+    </script>
+}

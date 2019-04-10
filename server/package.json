@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "deepstream.io": "^3.2.3"
+  }
+}

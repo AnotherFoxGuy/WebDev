@@ -1,0 +1,51 @@
+@model Tres_poker_management_application.Models.Gameprofile
+
+@{
+    ViewBag.Title = "Spelregels";
+    var Gameprofile_SQLModel = new Tres_poker_management_application.Models.Gameprofile_SQL();
+    var ProfileDropdownList = Gameprofile_SQLModel.GetProfileList();
+}
+<div class="grid-container">
+    <h2>Spelregels</h2>
+
+    <div class="grid-x">
+        <div class="medium-4 cell">
+
+            @Html.Label("Selecteer profiel")
+            @Html.DropDownListFor(model => model.Profile_ID, new SelectList(ProfileDropdownList, "Profile_ID", "Profilename"))
+            <a class="button" href="#" id="editbtn"><i class="far fa-edit"></i> Aanpassen</a>
+
+            @Html.LabelFor(model => model.Rules)
+            @Html.TextArea("Rules", "", 10, 100, new { @class = "", @readonly = true })
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script>
+        var id = "";
+        $(document).ready(function () {
+            id = $("select option:selected").attr("value");
+            $("#editbtn").attr("href", "/Rules/Edit/" + id);
+            GetPartialData();
+        });
+
+        $("select").change(function () {
+            id = $("select option:selected").attr("value");
+            $("#editbtn").attr("href", "/Rules/Edit/" + id);
+            GetPartialData();
+        });
+
+        function GetPartialData() {
+            $.ajax({
+                type: 'GET',
+                url: "/Rules/GetRules/" + id,
+                contentType: 'application/html; charset=utf-8',
+                success: function (result) {
+                    if (result != "") { $("#Rules").text(result); }
+                    else { $("#Rules").text("Dit profiel heeft nog geen spelregels."); }
+                }
+            });
+        }
+    </script>
+}
+

@@ -1,0 +1,103 @@
+﻿@model Tres_poker_management_application.Models.Game
+@{
+    ViewBag.Title = "Game";
+    var Gameprofile_SQLModel = new Tres_poker_management_application.Models.Gameprofile_SQL();
+    var ProfileDropdownList = Gameprofile_SQLModel.GetProfileList();
+}
+<div class="grid-container">
+    <h2>Game</h2>
+
+    <div class="grid-x grid-margin-x">
+        <div class="medium-8 large-6 cell">
+            <div class="grid-x">
+                <div class="auto cell">
+                    <label>Selecteer profiel</label>
+                    <select id="profile_dropdown">
+                        @foreach (var item in ProfileDropdownList)
+                        {
+                            <option value=@item["Profile_ID"]>@item["Profilename"]</option>
+                        }
+                    </select>
+                </div>
+                <div class="auto cell shrink">
+                    <br />
+                    <a href="/Settings/CreateProfile" class="button"><i class="fas fa-plus"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="grid-x">
+        <div class="cell medium-4">
+            <label>Automatich indelen</label>
+            <div class="switch small">
+                <input class="switch-input" id="automatic" type="checkbox" name="exampleSwitch" checked>
+                <label class="switch-paddle" for="automatic"></label>
+            </div>
+        </div>
+    </div>
+    <div class="button-group">
+        <a class="button" id="organizebtn">Tafels indelen</a>
+        <a class="button" id="startgamebtn"><i class="fas fa-play"></i> Start</a>
+    </div>
+    <div id="PartialData"></div>
+</div>
+@section Scripts {
+    <script>
+        var id = "";
+        if (sessionStorage.getItem("Switch_Auto") == null) { sessionStorage.setItem("Switch_Auto", 1); }
+        
+        $(document).ready(function () {
+            id = $("select option:selected").attr("value");
+            $("#startgamebtn").attr("href", `/Game/Start/${id}`);
+            $("#organizebtn").attr("href", `/Game/SetupTables/${id}`);
+            if (sessionStorage.getItem("Switch_Auto") == 0) { $("#automatic").prop('checked', false); }
+
+            GetPartialData();
+        });
+
+        $("select").change(function () {
+            id = $("select option:selected").attr("value");
+            $("#startgamebtn").attr("href", `/Game/Start/${id}`);
+            $("#organizebtn").attr("href", `/Game/SetupTables/${id}`);
+        });
+
+        $("#automatic").change(function () {
+            var $CHBX = $(this).is(":checked");
+            if ($CHBX) {
+                sessionStorage.setItem("Switch_Auto", 1);
+            }
+            else {
+                sessionStorage.setItem("Switch_Auto", 0);
+                DeleteAllTables();
+            }
+            GetPartialData();
+        });
+
+        function GetPartialData() {
+            $.ajax({
+                type: 'GET',
+                url: '/Game/GetPartialData/' + sessionStorage.getItem("Switch_Auto"),
+                contentType: 'application/html; charset=utf-8',
+                datatype: 'html',
+                success: function (data) {
+                    $('#PartialData').html('');
+                    $('#PartialData').html(data);
+                }
+            });
+        }
+
+        function DeleteAllTables() {
+            $.ajax({
+                type: 'GET',
+                url: '/Game/DeleteAllTables',
+                contentType: 'application/html; charset=utf-8'
+            });
+        }
+
+        function GetToken() {
+            var Createtoken = '@Html.AntiForgeryToken()';
+            Token = $(Createtoken).val();
+            return Token;
+        }
+    </script>
+}

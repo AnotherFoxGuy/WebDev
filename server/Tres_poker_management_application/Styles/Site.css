@@ -1,0 +1,65 @@
+﻿.validationtext {
+    color: orangered !important;
+}
+
+#admin-menu {
+    font-size: 1.25rem;
+    background-color: #1779ba;
+    color: #fefefe;
+}
+
+.selected {
+    background-color: cornflowerblue;
+}
+
+#rounds li {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+    border-bottom: 1px solid #e6e6e6;
+    cursor: pointer;
+}
+
+#userslist li {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+    border-bottom: 1px solid #e6e6e6;
+    cursor: pointer;
+}
+
+.userlistheader {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+    margin: 0;
+    background-color: #1779ba;
+    color: #fefefe;
+    font-size: 1.25rem;
+}
+
+.pokertables {
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+    border: 1px solid #aaaaaa;
+    margin-left: 0;
+}
+
+.pokertables li {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+    border-bottom: 1px solid #e6e6e6;
+    cursor: move;
+}
+
+.tablelist {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+    margin: 0;
+    background-color: #1779ba;
+    color: #fefefe;
+    font-size: 1.25rem;
+}
+
+#Pokertabledata {
+    width: 100%;
+    height: 100%;
+}

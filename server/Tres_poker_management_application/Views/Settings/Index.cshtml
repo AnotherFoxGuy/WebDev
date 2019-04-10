@@ -1,0 +1,90 @@
+﻿@{
+    ViewBag.Title = "Profielen";
+    var Gameprofile_SQLModel = new Tres_poker_management_application.Models.Gameprofile_SQL();
+    var ProfileDropdownList = Gameprofile_SQLModel.GetProfileList();
+}
+<div class="grid-container">
+    <h2>Profielen</h2>
+    <div class="grid-x">
+        <div class="auto cell">
+            <label>Selecteer profiel</label>
+            <select id="profile_dropdown">
+                @foreach (var item in ProfileDropdownList)
+                {
+                    <option value=@item["Profile_ID"]>@item["Profilename"]</option>
+                }
+            </select>
+        </div>
+        <div class="auto cell">
+            <div class="auto cell shrink">
+                <br />
+                <a href="/Settings/CreateProfile" class="button"><i class="fas fa-plus"></i></a>
+            </div>
+        </div>
+    </div>
+    <div class="button-group">
+        <a class="button" href="#" id="editbtn"><i class="far fa-edit"></i> Aanpassen</a>
+        <a class="button alert" id="deletebtn"><i class="far fa-trash-alt"></i> Verwijderen</a>
+    </div>
+    <div id="ProfileData"></div>
+</div>
+@section Scripts{
+<script>
+    var id = "";
+    $(document).ready(function () {
+        id = $("select option:selected").attr("value");
+        $("#editbtn").attr("href", "/Settings/EditProfile/" + id);
+        GetPartialData();
+    });
+
+    $("select").change(function () {
+        id = $("select option:selected").attr("value");
+        $("#editbtn").attr("href", "/Settings/EditProfile/" + id);
+        GetPartialData();
+    });
+
+    $("#deletebtn").click(function () {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Weet je zeker dat je dit will verwijdren?",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ja',
+            cancelButtonText: 'Nee',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.value) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Settings/DeleteProfile/" + id,
+                    dataType: "json",
+                    data: { __RequestVerificationToken: GetToken() },
+                    contentType: 'application/x-www-form-urlencoded; charset=utf-8',
+                });
+                setTimeout(() => {
+                        location.reload();
+                    },
+                    500);
+            }
+        });
+    });
+    function GetPartialData() {
+        $.ajax({
+            type: 'GET',
+            url: '/Settings/GetProfileData/' + id,
+            contentType: 'application/html; charset=utf-8',
+            datatype: 'html',
+            success: function (data) {
+                $('#ProfileData').html('');
+                $('#ProfileData').html(data);
+            }
+        });
+    }
+
+    function GetToken() {
+        var Createtoken = '@Html.AntiForgeryToken()';
+        Token = $(Createtoken).val();
+        return Token;
+    }
+</script>
+}

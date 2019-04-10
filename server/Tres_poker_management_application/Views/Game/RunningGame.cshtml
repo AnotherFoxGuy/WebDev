@@ -1,0 +1,151 @@
+﻿
+@{
+    ViewBag.Title = "RunningGame";
+    var dat = GameRunner.Instance.GetGameStatus() ? "Een game is bezig" : "Er is geen game bezig";
+    
+    string jsCdn = "https://cdn.jsdelivr.net/combine/";
+    jsCdn += "npm/moment@2/moment.min.js,";
+    jsCdn += "npm/moment-duration-format@2/lib/moment-duration-format.min.js,";
+    jsCdn += "npm/deepstream.io-client-js@2/dist/deepstream.min.js";
+    
+    var User_SQLModel = new Tres_poker_management_application.Models.User_SQL();
+    var ListOfUsers = User_SQLModel.GetUserList();
+}
+
+<div class="grid-container">
+    <h2>RunningGame</h2>
+
+    <div class="button-group">
+        <a class="button" href="/Game/Pause"><i class="fas fa-pause"></i> Pauze</a>
+        <a class="button" id="stopbtn"><i class="fas fa-stop"></i> Stop</a>
+    </div>
+    <div>
+        @dat
+    </div>
+    <div id="TimerBox">
+        Geen data
+    </div>
+    <div id="RoundsBox">
+        Geen data
+    </div>
+    <div id="GameStatusBox">
+        Geen data
+    </div>
+
+    <hr>
+    <div class="grid-x">
+        <div class="cell">
+            <table id="user-table" class="display">
+                <thead>
+                <tr>
+                    <th>Naam</th>
+                    <th>Gewonnen rondes</th>
+                    <th>Speelt mee</th>
+                </tr>
+                </thead>
+                <tbody id="userbool">
+                @foreach (var item in ListOfUsers)
+                {
+                    string check = "";
+                    if (item["Join_Game"] == 1) { check = "checked"; }
+                    <tr>
+                        <td>@item["Firstname"] @item["Lastname"]</td>
+                        <td>Gewonnen: @item["Wins"]</td>
+                        <td>
+                            <div class="switch tiny">
+                                <input class="switch-input" id="@item["User_ID"]" type="checkbox" name="exampleSwitch" @check>
+                                <label class="switch-paddle" for="@item["User_ID"]"></label>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script src="@jsCdn"></script>
+    <script>
+        var client = deepstream('anotherfoxguy.com:8181').login();
+        
+        $("#userbool input").change(function () {
+            var $this = $(this);
+            var $UID = $this.attr("id");
+            var $CHBX = $this.is(":checked");
+            if ($CHBX) {
+                JOIN = true;
+            }
+            else {
+                JOIN = false;
+            }
+            $.ajax({
+                type: "POST",
+                url: "/Game/UserInCurrentGame/" + $UID,
+                dataType: "json",
+                data: { __RequestVerificationToken: GetToken(), join: JOIN },
+                contentType: 'application/x-www-form-urlencoded; charset=utf-8'
+            });
+        });
+       
+        $("#stopbtn").click(function() {
+            Swal.fire({
+                title: 'Zeker weten?',
+                text: "Je kunt niet meer terug naar deze game!",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ja, stop deze game!',
+                cancelButtonText: 'Nee, spelen blijven!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                    location.href = "/Game/Stop";
+                }
+            });
+        });
+
+        client.event.subscribe('MergeTablesNotification',
+            value => {
+                Swal.fire({
+                    text: value,
+                    type: 'info',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ja, merge deze tafels',
+                    cancelButtonText: 'Nee, gewoon laten staan'
+                }).then((result) => {
+                    if (result.value) {
+                        location.href = "/Game/MergeTables";
+                    }
+                });
+            });
+
+        client.event.subscribe('TimerUpdate',
+            value => {
+                $("#TimerBox").text(`Timer: ${moment.duration(value).format()}`);
+            });
+
+        var tblrecord = client.record.getRecord('Global');
+
+        client.record.getRecord('Tables').subscribe(val => {
+            console.log(val);
+        });
+
+        tblrecord.subscribe(val => {
+            console.log(val);
+            $("#RoundsBox").text(`Rondes: ${val.Round}/${val.TotalNumberOfRounds}`);
+            $("#GameStatusBox").text(`Game Status: ${val.GameStatus}`);
+        });
+
+        function GetToken() {
+            var Createtoken = '@Html.AntiForgeryToken()';
+            Token = $(Createtoken).val();
+            return Token;
+        }
+       
+	   $(document).ready(() => {
+			$('#user-table').DataTable();
+		});
+    </script>
+}

@@ -1,0 +1,103 @@
+﻿@{
+    if (Session["loggedIn"] == null)
+    {
+        if (HttpContext.Current.Request.Url.AbsolutePath != "/Login")
+        {
+            Response.Redirect("/Login");
+        }
+
+    }
+}
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <title>pokertournament.cf</title>
+
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link href="~/Styles/Site.css" rel="stylesheet" type="text/css" />
+    <link href="~/Styles/Fixes.css" rel="stylesheet" type="text/css" />
+
+    @{
+        string jsCdn = "https://cdn.jsdelivr.net/combine/";
+        jsCdn += "npm/jquery@3,";
+        jsCdn += "npm/jquery-ui-dist@1/jquery-ui.min.js,";
+        jsCdn += "npm/jquery-ui-touch-punch@0,";
+        jsCdn += "npm/jquery-validation@1,";
+        jsCdn += "npm/datatables.net@1,";
+        jsCdn += "npm/jquery-validation-unobtrusive@3,";
+        jsCdn += "npm/foundation-sites@6,";
+        jsCdn += "npm/datatables.net-zf@1/js/dataTables.foundation.min.js,";
+        jsCdn += "npm/sweetalert2@8";
+
+        string cssCdn = "https://cdn.jsdelivr.net/combine/";
+        cssCdn += "npm/foundation-sites@6/dist/css/foundation.min.css,";
+        cssCdn += "npm/jquery-ui-dist@1/jquery-ui.css,";
+        cssCdn += "npm/datatables.net-zf@1/css/dataTables.foundation.min.css";
+    }
+    <script src="@jsCdn"></script>
+    <script src="https://cdn.staticaly.com/gh/AnotherFoxGuy/clippy.js/master/build/clippy.min.js"></script>
+    <link rel="stylesheet" href="@cssCdn">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css">
+    <link rel="stylesheet" href="https://cdn.staticaly.com/gh/AnotherFoxGuy/clippy.js/master/build/clippy.min.css">
+</head>
+<body>
+<div class="title-bar" data-responsive-toggle="Admin-menu" data-hide-for="medium">
+    <button class="menu-icon" type="button" data-toggle="Admin-menu"></button>
+    <div class="title-bar-title">Menu</div>
+</div>
+<div class="top-bar" id="Admin-menu" style="background-color: #1779ba">
+    <div class="top-bar-left">
+        <ul class="vertical medium-horizontal menu" style="background-color: #1779ba">
+            <li>
+                <a class="large button" href="/Game"><i class="fas fa-dice"></i> Game</a>
+            </li>
+            <li>
+                <a class="large button" href="/User"><i class="fas fa-users"></i> Gebruikers</a>
+            </li>
+            <li>
+                <a class="large button" href="/Chips"><i class="fas fa-coins"></i> Fiches</a>
+            </li>
+            <li>
+                <a class="large button" href="/Rules"><i class="fas fa-scroll"></i> Regels</a>
+            </li>
+            <li>
+                <a class="large button" href="/Settings"><i class="fas fa-cogs"></i> Profielen</a>
+            </li>
+        </ul>
+    </div>
+    <div class="top-bar-right">
+        <ul class="vertical medium-horizontal menu">
+            <li>
+                @using (Html.BeginForm("Logout", "Login", FormMethod.Post, new { id = "logout-form" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <a class="large button" onclick="document.getElementById('logout-form').submit();"><i class="fas fa-sign-out-alt"></i> Uitloggen</a>
+                }
+            </li>
+        </ul>
+    </div>
+</div>
+<div class="grid-container fluid body-content">
+    @RenderBody()
+    <hr/>
+    <footer>
+        <p>&copy; @DateTime.Now.Year - Stelletje studenten</p>
+    </footer>
+</div>
+<script>
+    $(document).foundation();
+    
+    var Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000
+    });
+</script>
+@RenderSection("Styles", false)
+@RenderSection("Scripts", false)
+</body>
+</html>

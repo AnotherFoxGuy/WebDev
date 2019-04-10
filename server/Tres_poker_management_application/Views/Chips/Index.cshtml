@@ -1,0 +1,48 @@
+﻿@model Tres_poker_management_application.Models.Gameprofile
+@{
+    ViewBag.Title = "Fiches";
+    var Gameprofile_SQLModel = new Tres_poker_management_application.Models.Gameprofile_SQL();
+    var ProfileDropdownList = Gameprofile_SQLModel.GetProfileList();
+}
+<div class="grid-container">
+    <h2>Fiches</h2>
+
+    <div class="grid-x">
+        <div class="medium-4 cell">
+            @Html.DropDownListFor(model => model.Profile_ID, new SelectList(ProfileDropdownList, "Profile_ID", "Profilename"))
+            <a class="button" href="#" id="editbtn"><i class="far fa-edit"></i> Aanpassen</a>
+            <div id="ChipsData"></div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script>
+        var id = "";
+        $(document).ready(function () {
+            id = $("select option:selected").attr("value");
+            $("#editbtn").attr("href", "/Chips/Edit/" + id);
+            GetPartialData();
+        });
+
+        $("select").change(function () {
+            id = $("select option:selected").attr("value");
+            $("#editbtn").attr("href", "/Chips/Edit/" + id);
+            GetPartialData();
+        });
+
+        function GetPartialData() {
+            $.ajax({
+                type: 'GET',
+                url: '/Chips/GetChipsData/' + id,
+                contentType: 'application/html; charset=utf-8',
+                datatype: 'html',
+                success: function (data) {
+                    $('#ChipsData').html('');
+                    $('#ChipsData').html(data);
+                }
+            });
+        }
+    </script>
+
+}
+

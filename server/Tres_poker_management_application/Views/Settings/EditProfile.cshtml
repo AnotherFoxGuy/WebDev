@@ -1,0 +1,237 @@
+﻿@model Tres_poker_management_application.Models.AllModels
+@{
+    ViewBag.Title = "EditProfile";
+    var SQLModel = new Tres_poker_management_application.Models.Round_SQL();
+    var RoundsList = SQLModel.GetRoundList(Model.Gameprofile.Profile_ID);
+}
+
+<div class="grid-container">
+    <h2>Profiel aanpassen</h2>
+
+    <div class="grid-x">
+        <div class="medium-4 cell">
+            @using (Html.BeginForm("EditProfile", "Settings"))
+            {
+                @Html.AntiForgeryToken()
+
+                @Html.LabelFor(model => model.Gameprofile.Profilename)
+                @Html.EditorFor(model => model.Gameprofile.Profilename)
+                @Html.ValidationMessageFor(model => model.Gameprofile.Profilename, "", new { @class = "validationtext" })
+
+                @Html.LabelFor(model => model.Gameprofile.Starting_Budget)
+                @Html.EditorFor(model => model.Gameprofile.Starting_Budget)
+                @Html.ValidationMessageFor(model => model.Gameprofile.Starting_Budget, "", new { @class = "validationtext" })
+
+                @Html.LabelFor(model => model.Gameprofile.Rebuy)
+                @Html.EditorFor(model => model.Gameprofile.Rebuy)
+                @Html.ValidationMessageFor(model => model.Gameprofile.Rebuy, "", new { @class = "validationtext" })
+
+                <div class="grid-x grid-margin-x">
+                    <div class="large-6 cell">
+                        @Html.LabelFor(model => model.Gameprofile.Pause_Time)
+                        @Html.EditorFor(model => model.Gameprofile.Pause_Time)
+                        @Html.ValidationMessageFor(model => model.Gameprofile.Pause_Time, "", new { @class = "validationtext" })
+                    </div>
+                    <div class="large-6 cell">
+                        @Html.LabelFor(model => model.Gameprofile.Pause_After)
+                        @Html.EditorFor(model => model.Gameprofile.Pause_After)
+                        @Html.ValidationMessageFor(model => model.Gameprofile.Pause_After, "", new { @class = "validationtext" })
+                    </div>
+                </div>
+                <a class="button" id="submitbtn"><i class="fas fa-check"></i> Opslaan</a>
+                <a class="button" href="/Settings"><i class="fas fa-reply"></i> Terug</a>
+            }
+        </div>
+    </div>
+
+    <h2>Profiel rondes aanpassen</h2>
+    <div class="primary progress custom-aria" role="progressbar" tabindex="0" aria-valuenow="1" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-meter custom" style="width: 0%">
+            <p class="progress-meter-text"><span class="custom-text" style="display: none">100</span><span style="display: none">%</span></p>
+        </div>
+    </div>
+    <div class="grid-x grid-margin-x">
+        <div class="medium-6 large-auto cell">
+            <label>
+                Ronde tijd
+                <input id="roundtime" type="time" />
+            </label>
+        </div>
+        <div class="medium-6 large-auto cell">
+            <label>
+                Small blind
+                <input id="smallblind" type="number" min="1" />
+            </label>
+        </div>
+        <div class="medium-6 large-auto cell">
+            <label>
+                Big blind
+                <input id="bigblind" type="number" min="1" />
+            </label>
+        </div>
+        <div class="medium-auto large-auto cell">
+            <Label>
+                Ronde(s)
+                <input id="rounds2add" type="number" value="1" min="1" name="@Html.DisplayFor(model => model.Gameprofile.Profile_ID)">
+            </Label>
+        </div>
+        <div class="medium-auto large-auto cell">
+            <label>Update/Delete/Toev.</label>
+            <div class="button-group">
+                <a class="button" id="updateroundbutten">
+                    <i class="far fa-edit"></i>
+                </a>
+                <a class="button alert" id="deleteroundbtn">
+                    <i class="far fa-trash-alt"></i>
+                </a>
+                <a class="button" id="addroundbtn">
+                    <i class="fas fa-plus"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-x grid-margin-x">
+        <div class="cell">
+            <ul id="rounds">
+                @foreach (var item in RoundsList)
+                {
+                    <li class="grid-x grid-margin-x">
+                        <div class="large-2 cell">Ronde @item["Round_NR"]</div>
+                        <div class="large-4 cell">Lengte: @item["Round_Time"] minuten</div>
+                        <div class="large-3 cell">Small blind: @item["Small_Blind"]</div>
+                        <div class="large-3 cell">Big blind: @item["Big_Blind"]</div>
+                        <input type="hidden" value="@item["Round_ID"]" name="@item["Gameprofile_Profile_ID"]" />
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+@section Scripts{
+<script>
+    var timeout = 5000;
+
+    $(document).ready(function () {
+        $("#submitbtn").click(function () {
+            $(this).closest("form").submit();
+        });
+    });
+
+    $("#rounds li").click(function () {
+        $(this).toggleClass("selected");
+    });
+
+    $("#updateroundbutten").click(function () {
+        ProgresB();
+        var RT = $("#roundtime").val();
+        var RSB = $("#smallblind").val();
+        var RBB = $("#bigblind").val();
+        $("#rounds li").each(function (index, li) {
+            var RID = $(li).children("input").attr("value");
+            var PID = $(li).children("input").attr("name");
+            if ($(li).hasClass("selected")) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Rounds/EditRound/" + RID,
+                    dataType: "json",
+                    data: {
+                        __RequestVerificationToken: GetToken(),
+                        round: { Gameprofile_Profile_ID: PID, Round_Time: RT, Small_Blind: RSB, Big_Blind: RBB }
+                    },
+                    contentType: 'application/x-www-form-urlencoded; charset=utf-8'
+                });
+            }
+        });
+        setTimeout(() => {
+                location.reload();
+            },
+            timeout);
+    });
+
+    $("#deleteroundbtn").click(function () {
+        ProgresB();
+        var i = 1;
+        $("#rounds li").each(function (index, li) {
+            var RID = $(li).children("input").attr("value");
+            if ($(li).hasClass("selected")) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Rounds/DeleteRound/" + RID,
+                    dataType: "json",
+                    data: { __RequestVerificationToken: GetToken() },
+                    contentType: 'application/x-www-form-urlencoded; charset=utf-8'
+                });
+            }
+            else {
+                $.ajax({
+                    type: "POST",
+                    url: "/Rounds/EditRoundNumber/" + RID,
+                    dataType: "json",
+                    data: { __RequestVerificationToken: GetToken(), round: { Round_NR: i } },
+                    contentType: 'application/x-www-form-urlencoded; charset=utf-8'
+                });
+                i++;
+            }
+        });
+        setTimeout(() => {
+            location.reload(true);
+        },
+            timeout);
+    });
+
+    $("#addroundbtn").click(function () {
+        ProgresB();
+        var PID = $("#rounds2add").attr("name");
+        var RNR = $("#rounds li").length + 1;
+        var RT = $("#roundtime").val();
+        var RSB = $("#smallblind").val();
+        var RBB = $("#bigblind").val();
+        var RTA = $("#rounds2add").val();
+        for (var i = 0; i < RTA; i++) {
+            $.ajax({
+                type: "POST",
+                url: "/Rounds/AddRounds/",
+                dataType: "json",
+                data: {
+                    __RequestVerificationToken: GetToken(),
+                    round: {
+                        Gameprofile_Profile_ID: PID,
+                        Round_NR: RNR,
+                        Round_Time: RT,
+                        Small_Blind: RSB,
+                        Big_Blind: RBB
+                    }
+                },
+                contentType: 'application/x-www-form-urlencoded; charset=utf-8'
+            });
+            RNR++;
+        }
+        setTimeout(() => {
+                location.reload();
+            },
+            timeout);
+    });
+    function ProgresB() {
+        $(".custom").animate({ width: "100%" }, timeout);
+        $(".progress-meter-text span").show();
+        $(".custom-text").each(function () {
+            $(this).prop('Counter', 0).animate({
+                Counter: $(this).text()
+            }, {
+                duration: timeout,
+                easing: 'swing',
+                step: function (now) {
+                    $(this).text(Math.ceil(now));
+                }
+            });
+        });
+    }
+
+    function GetToken() {
+        var Createtoken = '@Html.AntiForgeryToken()';
+        Token = $(Createtoken).val();
+        return Token;
+    }
+</script>
+}

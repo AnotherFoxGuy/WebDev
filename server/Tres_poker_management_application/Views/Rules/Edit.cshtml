@@ -1,0 +1,34 @@
+﻿@model Tres_poker_management_application.Models.Gameprofile
+@{
+    ViewBag.Title = "EditRules";
+}
+<div class="grid-container">
+    <h2>Aanpassen spelregels</h2>
+    <div class="grid-x">
+        <div class="medium-4 cell">
+            @Html.Label("Profiel")
+            @Html.TextBox("textbox", Model.Profilename, new { @class = "", @readonly = true })
+            @using (Html.BeginForm("Edit", "Rules"))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true, "", new { @class = "validationtext" })
+                @Html.LabelFor(model => model.Rules)
+                @Html.TextAreaFor(model => model.Rules, 10, 100, new { @class = "" })
+                @Html.Hidden("Profile_ID", Model.Profile_ID);
+                @Html.ActionLink("Anuleren", "Index", "Rules", null, new { @class = "button alert" })
+
+                <a class="button" id="submitbtn"><i class="fas fa-check"></i> Opslaan</a>
+                <a class="button" href="/Rules"><i class="fas fa-reply"></i> Terug</a>
+            }
+        </div>
+    </div>
+</div>
+@section scripts{
+<script>
+    $(document).ready(function () {
+        $("#submitbtn").click(function () {
+            $(this).closest("form").submit();
+        });
+    });
+</script>
+}

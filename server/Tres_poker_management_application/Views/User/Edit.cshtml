@@ -1,0 +1,31 @@
+﻿@model Tres_poker_management_application.Models.User
+@{
+    ViewBag.Title = "Edit";
+}
+<div class="grid-container">
+    <h2>Gebruiker aanpassen</h2>
+
+    @using (Html.BeginForm("Edit", "User"))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "validationtext" })
+        @Html.LabelFor(model => model.Firstname)
+        @Html.EditorFor(model => model.Firstname)
+        @Html.ValidationMessageFor(model => model.Firstname, "", new { @class = "validationtext" })
+        @Html.LabelFor(model => model.Lastname)
+        @Html.EditorFor(model => model.Lastname)
+        @Html.ValidationMessageFor(model => model.Lastname, "", new { @class = "validationtext" })
+
+        <a class="button" id="submitbtn"><i class="fas fa-check"></i> Opslaan</a>
+        <a class="button" href="/User"><i class="fas fa-reply"></i> Terug</a>
+    }
+</div>
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $("#submitbtn").click(function () {
+                $(this).closest("form").submit();
+            });
+        });
+    </script>
+}

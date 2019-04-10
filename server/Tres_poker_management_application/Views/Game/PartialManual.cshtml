@@ -1,0 +1,260 @@
+﻿@model Tres_poker_management_application.Models.Poker_Table
+@{
+    var ListOfUsers = new Tres_poker_management_application.Models.User_SQL().GetUserList();
+    var ListOfTables = new Tres_poker_management_application.Models.Poker_Table_SQL().GetTableList();
+    var Addedtable = "Voeg een tafel toe";
+    var AddedtableID = 0;
+    if (ListOfTables.Count() != 0)
+    {
+        Addedtable = ListOfTables.LastOrDefault()["Table_Name"];
+        AddedtableID = ListOfTables.LastOrDefault()["Table_ID"];
+    }
+}
+
+<div class="primary progress custom-aria" role="progressbar" tabindex="0" aria-valuenow="1" aria-valuemin="0" aria-valuemax="100">
+    <div class="progress-meter custom" style="width: 0%">
+        <p class="progress-meter-text"><span class="custom-text" style="display: none">100</span><span style="display: none">%</span></p>
+    </div>
+</div>
+<div class="grid-x grid-margin-x">
+    <div class="medium-6 large-4 cell">
+        <div class="grid-x">
+            <div class="auto cell">
+                <label>
+                    Tafel toevoegen
+                    <input type="text" id="tablename" />
+                </label>
+            </div>
+            <div class="auto cell shrink">
+                <br />
+                <a class="button" id="addtablebtn">
+                    <i class="fas fa-plus"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="medium-6 large-4 cell">
+        <div class="grid-x">
+            <div class="auto cell">
+                <label>
+                    Tafel naam aanpassen
+                    <input type="text" id="changetablename" />
+                </label>
+            </div>
+            <div class="auto cell shrink">
+                <br />
+                <a class="button" id="edittablebtn">
+                    <i class="far fa-edit"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="medium-6 large-4 cell">
+        <div class="grid-x">
+            <div class="auto cell">
+                <label>Selecteer tafel</label>
+                <select id="table_dropdown">
+                    @foreach (var item in ListOfTables)
+                    {
+                        if (item["Table_ID"] == AddedtableID)
+                        {
+                            <option value=@item["Table_ID"] selected="selected">@item["Table_Name"]</option>
+                        }
+                        else
+                        {
+                            <option value=@item["Table_ID"]>@item["Table_Name"]</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="auto shrink cell">
+                <br />
+                <a class="button" id="adduser2tablebtn">
+                    <i class="fas fa-arrow-left"> Indelen</i>
+                </a>
+            </div>
+            <div class="auto cell shrink">
+                <br />
+                <a class="button alert" id="deletetablebtn">
+                    <i class="far fa-trash-alt"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="grid-x grid-margin-x">
+    <div class="large-8 cell">
+        <ul class="userlistheader">
+            <li class="grid-x">
+                <div class="auto cell">Naam</div>
+                <div class="shrink cell">Wins</div>
+            </li>
+        </ul>
+        <ul id="userslist">
+            @foreach (var item in ListOfUsers)
+            {
+                if (item["Poker_Table_Table_ID"]as int? == null) 
+                {
+                    <li class="grid-x grid-margin-x @item["Poker_Table_Table_ID"]" id="@item["User_ID"]">
+                        <div class="auto cell" style="overflow:hidden">@item["Firstname"] @item["Lastname"]</div>
+                        <div class="shrink cell">Gewonnen: @item["Wins"]</div>
+                    </li>
+                }
+            }
+        </ul>
+    </div>
+    <div class="large-4 cell">
+        <div class="auto cell">
+            <div class="callout" id="Pokertabledata">
+                <h5 id="selected_table">@Addedtable</h5>
+                <ul id="tableswithusers">
+                    @foreach (var item in ListOfUsers)
+                    {
+                        if (item["Poker_Table_Table_ID"] as int? != null)
+                        {
+                        <li class="grid-x grid-margin-x @item["Poker_Table_Table_ID"] all-users" id="@item["User_ID"]">
+                            <div class="auto cell">@item["Firstname"] @item["Lastname"]</div>
+                            <div class="shrink cell">Gewonnen: @item["Wins"]</div>
+                        </li>
+                        }
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var timeout = 5000;
+    var select = "#table_dropdown option:selected";
+    var PTN = "";
+    var SPTN = $(select).text();
+    var PTID = $(select).val();
+
+    $(document).ready(function () {
+        $("#changetablename").val(SPTN);
+        $(".all-users").hide();
+        $("." + PTID).show();
+    });
+
+    $("#addtablebtn").click(function () {
+        PTN = $("#tablename").val();
+        Createtable();
+    });
+
+    $("#adduser2tablebtn").click(function () {
+        $("#userslist li").each(function (index, li) {
+            if ($(li).hasClass("selected")) {
+                Setuser2table($(li).attr("id"), PTID);
+            }
+        });
+        $("#tableswithusers li").each(function (index, li) {
+            if ($(li).hasClass("selected")) {
+                Setuser2table($(li).attr("id"), null);
+            }
+        });
+        ProgresB();
+        setTimeout(() => {
+            location.reload();
+        },
+            timeout);
+    });
+
+    $("#edittablebtn").click(function () {
+        PTN = $("#changetablename").val();
+        Edittable();
+    });
+
+    $("#deletetablebtn").click(function () {
+        deletetable();
+    });
+
+    $("#table_dropdown").change(function () {
+        SPTN = $(select).text();
+        PTID = $(select).val();
+        $("#selected_table").text(SPTN);
+        $("#changetablename").val(SPTN);
+        $(".all-users").hide();
+        $("." + PTID).show();
+    });
+
+    $("#userslist li").click(function () {
+        $(this).toggleClass("selected");
+    });
+
+    $("#tableswithusers li").click(function () {
+        $(this).toggleClass("selected");
+    });
+
+    function Createtable() {
+        $.ajax({
+            type: "POST",
+            url: "/Game/CreatePokerTable",
+            dataType: "json",
+            data: { __RequestVerificationToken: GetToken(), poker_Table: { table_Name: PTN } },
+            contentType: 'application/x-www-form-urlencoded; charset=utf-8',
+        });
+        location.reload();
+    }
+
+    function Edittable() {
+        $.ajax({
+            type: "POST",
+            url: "/Game/EditPokerTable/" + PTID,
+            dataType: "json",
+            data: {
+                __RequestVerificationToken: GetToken(),
+                poker_Table: { Table_ID: PTID, Table_Name: PTN }
+            },
+            contentType: 'application/x-www-form-urlencoded; charset=utf-8'
+        });
+        location.reload();
+    }
+
+    function deletetable() {
+        $.ajax({
+            type: "POST",
+            url: "/Game/DeletePokerTable/" + PTID,
+            dataType: "json",
+            data: {
+                __RequestVerificationToken: GetToken()
+            },
+            contentType: 'application/x-www-form-urlencoded; charset=utf-8'
+        });
+        location.reload();
+    }
+
+    function Setuser2table(UID, TID) {
+        $.ajax({
+            type: "POST",
+            url: "/Game/AddUser2Table/" + UID,
+            dataType: "json",
+            data: {
+                __RequestVerificationToken: GetToken(),
+                table_id: TID
+            },
+            contentType: 'application/x-www-form-urlencoded; charset=utf-8'
+        });
+    }
+
+    function ProgresB() {
+        $(".custom").animate({ width: "100%" }, timeout);
+        $(".progress-meter-text span").show();
+        $(".custom-text").each(function () {
+            $(this).prop('Counter', 0).animate({
+                Counter: $(this).text()
+            }, {
+                    duration: timeout,
+                    easing: 'swing',
+                    step: function (now) {
+                        $(this).text(Math.ceil(now));
+                    }
+                });
+        });
+    }
+
+    function GetToken() {
+        var Createtoken = '@Html.AntiForgeryToken()';
+        Token = $(Createtoken).val();
+        return Token;
+    }
+</script>

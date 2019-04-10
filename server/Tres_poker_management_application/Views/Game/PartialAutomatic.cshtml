@@ -1,0 +1,89 @@
+﻿@{
+    var User_SQLModel = new Tres_poker_management_application.Models.User_SQL();
+    var ListOfUsers = User_SQLModel.GetUserList();
+}
+
+<div class="grid-x">
+    <div class="cell">
+        <table id="user-table" class="display">
+            <thead>
+                <tr>
+                    <th>Naam</th>
+                    <th>Gewonnen rondes</th>
+                    <th><input type="checkbox" id="selectallusers" /> Iedereen</th>
+                </tr>
+            </thead>
+            <tbody id="userbool">
+                @foreach (var item in ListOfUsers)
+                {
+                    string check = "";
+                    if (item["Join_Game"] == 1) { check = "checked"; }
+                    <tr>
+                        <td>@item["Firstname"] @item["Lastname"]</td>
+                        <td>Gewonnen: @item["Wins"]</td>
+                        <td>
+                            <div class="switch tiny">
+                                <input class="switch-input" id="@item["User_ID"]" type="checkbox" name="exampleSwitch" @check>
+                                <label class="switch-paddle" for="@item["User_ID"]"></label>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        if ($("#userbool input:checked").length == $("#userbool tr").length) { $("#selectallusers").prop("checked", true); };
+    });
+
+    $("#selectallusers").change(function () {
+        var $CHBX = $(this).is(":checked");
+        var JOIN;
+        if ($CHBX) {
+            JOIN = true;
+        }
+        else {
+            JOIN = false;
+        }
+        $.ajax({
+            type: "POST",
+            url: "/Game/AllUsersInGame/",
+            dataType: "json",
+            data: { __RequestVerificationToken: GetToken(), join: JOIN},
+            contentType: 'application/x-www-form-urlencoded; charset=utf-8'
+        });
+        location.reload();
+    });
+
+    $("#userbool input").change(function () {
+        var $this = $(this);
+        var $UID = $this.attr("id");
+        var $CHBX = $this.is(":checked");
+        if ($CHBX) {
+            JOIN = true;
+        }
+        else {
+            JOIN = false;
+        }
+        $.ajax({
+            type: "POST",
+            url: "/Game/UserInGame/" + $UID,
+            dataType: "json",
+            data: { __RequestVerificationToken: GetToken(), join: JOIN },
+            contentType: 'application/x-www-form-urlencoded; charset=utf-8'
+        });
+    });
+
+    function GetToken() {
+        var Createtoken = '@Html.AntiForgeryToken()';
+        Token = $(Createtoken).val();
+        return Token;
+    }
+
+    $(document).ready(function () {
+        $('#user-table').DataTable();
+    });
+</script>

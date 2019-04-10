@@ -1,0 +1,49 @@
+﻿@model Tres_poker_management_application.Models.Chips
+@{
+    ViewBag.Title = "EditChips";
+}
+<div class="grid-container">
+    <h2>Aanpassen chip waarden</h2>
+    <div class="grid-x">
+        <div class="medium-4 cell">
+            @Html.Label("Profiel")
+            @using (Html.BeginForm("Edit", "Chips"))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true, "", new { @class = "validationtext" })
+
+                @Html.LabelFor(model => model.Green)
+                @Html.EditorFor(model => model.Green)
+                @Html.ValidationMessageFor(model => model.Green, "", new { @class = "validationtext" })
+
+                @Html.LabelFor(model => model.Purple)
+                @Html.EditorFor(model => model.Purple)
+                @Html.ValidationMessageFor(model => model.Purple, "", new { @class = "validationtext" })
+
+                @Html.LabelFor(model => model.Red)
+                @Html.EditorFor(model => model.Red)
+                @Html.ValidationMessageFor(model => model.Red, "", new { @class = "validationtext" })
+
+                @Html.LabelFor(model => model.White)
+                @Html.EditorFor(model => model.White)
+                @Html.ValidationMessageFor(model => model.White, "", new { @class = "validationtext" })
+
+                @Html.LabelFor(model => model.Black)
+                @Html.EditorFor(model => model.Black)
+                @Html.ValidationMessageFor(model => model.Black, "", new { @class = "validationtext" })
+
+                <a class="button" id="submitbtn"><i class="fas fa-check"></i> Opslaan</a>
+                <a class="button" href="/Chips"><i class="fas fa-reply"></i> Terug</a>
+            }
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $("#submitbtn").click(function () {
+                $(this).closest("form").submit();
+            });
+        });
+    </script>
+}
